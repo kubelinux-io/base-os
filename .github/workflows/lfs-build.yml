@@ -51,6 +51,8 @@ jobs:
 
       - name: Build LFS System
         run: |
+          cp build/build-* ${LFS}/
+          chmod +x ${LFS}/build-*
           cd build
           bash build-lfs.sh
 
