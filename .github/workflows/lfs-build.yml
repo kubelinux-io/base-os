@@ -1,8 +1,5 @@
 name: Build Kubelinux Base OS
 
-env:
-  PATH: ${GITHUB_WORKSPACE}/tools/bin:${PATH}
-
 on:
   push:
     branches:
@@ -58,7 +55,7 @@ jobs:
           tar -xf ${GITHUB_WORKSPACE}/sources/binutils-*.tar.xz -C binutils
           cd binutils && mkdir build
           ../configure \
-            --prefix=${GITHUB_WORKSPACE}/output/tools \
+            --prefix=${GITHUB_WORKSPACE}/tools \
             --with-sysroot=${GITHUB_WORKSPACE}/output \
             --target=$(uname -m)-lfs-linux-gnu \
             --disable-nls \
