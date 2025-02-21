@@ -29,10 +29,25 @@ jobs:
           echo "export LFS=/mnt/lfs" >> ~/.bashrc
           source ~/.bashrc
 
+      - name: Restore Cached LFS Packages
+        id: cache-lfs-packages-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            /mnt/lfs
+          key: lfs-package-cache
+
       - name: Download LFS Packages
         run: |
-          wget http://www.linuxfromscratch.org/lfs/downloads/stable/wget-list
           wget --input-file=wget-list --continue --directory-prefix=$LFS/sources
+
+      - name: Save Cached LFS Packages
+        id: cache-lfs-packages-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            /mnt/lfs
+          key: lfs-package-cache
 
       - name: Build LFS System
         run: |
