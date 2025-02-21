@@ -31,9 +31,9 @@ jobs:
         run: |
           mkdir -p ${GITHUB_WORKSPACE}/sources
           if wget --input-file=wget-list --continue --directory-prefix=${GITHUB_WORKSPACE}/sources; then
-            echo -ne "0" > ${{ runner.temp }}/wget_status
+            echo -ne "0" > /tmp/wget_status
           else
-            echo -ne "1" > ${{ runner.temp }}/wget_status
+            echo -ne "1" > /tmp/wget_status
           fi
 
       - name: Cache Kubelinux Source
@@ -47,7 +47,7 @@ jobs:
       
       - name: Source Code Failure Exit
         run: |
-          exit $(cat ${{ runner.temp }}/wget_status)
+          exit $(cat /tmp/wget_status)
 
       - name: Build Binutils
         run: |
