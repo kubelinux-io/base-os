@@ -9,22 +9,17 @@ jobs:
   build:
     runs-on: self-hosted
     container:
-      image: rockylinux:9
+      image: ghcr.io/kubelinux-io/bootstrap-container:main
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
-      - name: Install Build Dependencies
-        run: |
-          dnf install -y make gcc g++ perl python3 info wget bison flex patch tar xz
 
       - name: Restore Cached Kubelinux Source
         id: restore-kubelinux-source
         uses: actions/cache/restore@v4
         with:
           path: |
-            ${GITHUB_WORKSPACE}/sources
-            ${GITHUB_WORKSPACE}/sources/*
+            sources
           key: kubelinux-source
 
       - name: Download Kubelinux Source
@@ -41,8 +36,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: |
-            ${GITHUB_WORKSPACE}/sources
-            ${GITHUB_WORKSPACE}/sources/*
+            sources
           key: ${{ steps.restore-kubelinux-source.outputs.cache-primary-key }}
       
       - name: Source Code Failure Exit
