@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     container:
       image: rockylinux:9
     steps:
@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Build Dependencies
         run: |
-          sudo dnf install -y make gcc g++ perl python3 texinfo wget bison flex patch tar xz
+          dnf install -y make gcc g++ perl python3 texinfo wget bison flex patch tar xz
 
       - name: Prepare LFS Build Environment
         run: |
