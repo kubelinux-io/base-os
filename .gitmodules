@@ -10,3 +10,12 @@
 [submodule "sources/automake"]
 	path = sources/automake
 	url = git://git.savannah.gnu.org/automake.git
+[submodule "sources/bash"]
+	path = sources/bash
+	url = https://git.savannah.gnu.org/git/bash.git
+[submodule "sources/bc"]
+	path = sources/bc
+	url = https://git.gavinhoward.com/gavin/bc.git
+[submodule "sources/binutils"]
+	path = sources/binutils
+	url = git://sourceware.org/git/binutils-gdb.git
