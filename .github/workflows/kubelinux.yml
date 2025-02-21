@@ -46,9 +46,9 @@ jobs:
       - name: Build Binutils
         run: |
           cd ${GITHUB_WORKSPACE}/sources && mkdir binutils
-          tar -xf ${GITHUB_WORKSPACE}/sources/binutils-*.tar.xz -C binutils
+          tar -xf ${GITHUB_WORKSPACE}/sources/binutils-*.tar.xz -C binutils --strip-components=1
           cd binutils && mkdir build
-          ../configure \
+          ./configure \
             --prefix=${GITHUB_WORKSPACE}/tools \
             --with-sysroot=${GITHUB_WORKSPACE}/output \
             --target=$(uname -m)-lfs-linux-gnu \
