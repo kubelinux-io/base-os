@@ -1,13 +1,10 @@
-name: Build LFS Base OS
+name: Build Kubelinux Base OS
 
 env:
-  LFS: /mnt/lfs
+  PATH: ${GITHUB_WORKSPACE}/tools/bin:${PATH}
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -24,48 +21,53 @@ jobs:
         run: |
           dnf install -y make gcc g++ perl python3 info wget bison flex patch tar xz
 
-      - name: Prepare LFS Build Environment
-        run: |
-          mkdir -p ${LFS}
-          mkdir -p ${LFS}/data
-          mkdir -p ${LFS}/sources
-
-      - name: Restore Cached LFS Packages
-        id: cache-lfs-packages-restore
+      - name: Restore Cached Kubelinux Source
+        id: restore-kubelinux-source
         uses: actions/cache/restore@v4
         with:
           path: |
-            /mnt/lfs/sources
-            /mnt/lfs/sources/*
-          key: lfs-package-cache
+            ${GITHUB_WORKSPACE}/sources
+            ${GITHUB_WORKSPACE}/sources/*
+          key: kubelinux-source
 
-      - name: Download LFS Packages
+      - name: Download Kubelinux Source
         run: |
-          if wget --input-file=wget-list --continue --directory-prefix=${LFS}/sources; then
-            echo -ne "0" > ${LFS}/data/wget_status
+          mkdir -p ${GITHUB_WORKSPACE}/sources
+          if wget --input-file=wget-list --continue --directory-prefix=${GITHUB_WORKSPACE}/sources; then
+            echo -ne "0" > ${{ runner.temp }}/wget_status
           else
-            echo -ne "1" > ${LFS}/data/wget_status
+            echo -ne "1" > ${{ runner.temp }}/wget_status
           fi
 
-      - name: Save Cached LFS Packages
-        id: cache-lfs-packages-save
+      - name: Cache Kubelinux Source
+        id: cache-kubelinux-source
         uses: actions/cache/save@v4
         with:
           path: |
-            /mnt/lfs/sources
-            /mnt/lfs/sources/*
-          key: lfs-package-cache
+            ${GITHUB_WORKSPACE}/sources
+            ${GITHUB_WORKSPACE}/sources/*
+          key: ${{ steps.restore-kubelinux-source.outputs.cache-primary-key }}
       
-      - name: Bail if Packages Missing
+      - name: Source Code Failure Exit
         run: |
-          exit $(cat ${LFS}/data/wget_status)
+          exit $(cat ${{ runner.temp }}/wget_status)
 
-      - name: Build LFS System
+      - name: Build Binutils
         run: |
-          cp build/build-* ${LFS}/
-          chmod +x ${LFS}/build-*
-          cd build
-          bash build-lfs.sh
+          cd ${GITHUB_WORKSPACE}/sources && mkdir binutils
+          tar -xf ${GITHUB_WORKSPACE}/sources/binutils-*.tar.xz -C binutils
+          cd binutils && mkdir build
+          ../configure \
+            --prefix=${GITHUB_WORKSPACE}/output/tools \
+            --with-sysroot=${GITHUB_WORKSPACE}/output \
+            --target=$(uname -m)-lfs-linux-gnu \
+            --disable-nls \
+            --disable-werror
+          make -j$(nproc)
+          make install
+          cd ${GITHUB_WORKSPACE} && rm -Rf ${GITHUB_WORKSPACE}/sources/binutils
+
+          
 
       #- name: Create OSTree Repository
       #  run: |
