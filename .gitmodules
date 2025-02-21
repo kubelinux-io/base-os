@@ -19,3 +19,30 @@
 [submodule "sources/binutils"]
 	path = sources/binutils
 	url = git://sourceware.org/git/binutils-gdb.git
+[submodule "sources/bison"]
+	path = sources/bison
+	url = https://git.savannah.gnu.org/git/bison.git
+[submodule "sources/bzip2"]
+	path = sources/bzip2
+	url = https://gitlab.com/bzip2/bzip2.git
+[submodule "sources/check"]
+	path = sources/check
+	url = https://github.com/libcheck/check.git
+[submodule "sources/coreutils"]
+	path = sources/coreutils
+	url = git://git.sv.gnu.org/coreutils
+[submodule "sources/dejagnu"]
+	path = sources/dejagnu
+	url = git://git.sv.gnu.org/dejagnu.git
+[submodule "sources/diffutils"]
+	path = sources/diffutils
+	url = https://git.savannah.gnu.org/git/diffutils.git
+[submodule "sources/e2fsprogs"]
+	path = sources/e2fsprogs
+	url = https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git
+[submodule "sources/elfutils"]
+	path = sources/elfutils
+	url = git://sourceware.org/git/elfutils.git
+[submodule "sources/findutils"]
+	path = sources/findutils
+	url = https://git.savannah.gnu.org/git/findutils.git
