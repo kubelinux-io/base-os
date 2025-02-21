@@ -43,21 +43,70 @@ jobs:
         run: |
           exit $(cat /tmp/wget_status)
 
-      - name: Build Binutils
+      - name: Prepare Binutils
         run: |
           cd ${GITHUB_WORKSPACE}/sources && mkdir binutils
           tar -xf ${GITHUB_WORKSPACE}/sources/binutils-*.tar.xz -C binutils --strip-components=1
           cd binutils && mkdir build
+
+      - name: Configure Binutils
+        run: |
+          cd ${GITHUB_WORKSPACE}/sources/binutils
           ./configure \
             --prefix=${GITHUB_WORKSPACE}/tools \
             --with-sysroot=${GITHUB_WORKSPACE}/output \
             --target=$(uname -m)-lfs-linux-gnu \
             --disable-nls \
             --disable-werror
+      
+      - name: Make Binutils
+        run: |
+          cd ${GITHUB_WORKSPACE}/sources/binutils
           make -j$(nproc)
           make install
           cd ${GITHUB_WORKSPACE} && rm -Rf ${GITHUB_WORKSPACE}/sources/binutils
 
+      - name: Prepare GCC Build
+        run: |
+          cd ${GITHUB_WORKSPACE}/sources && mkdir gcc
+          tar -xf ${GITHUB_WORKSPACE}/sources/gcc-*.tar.xz -C gcc --strip-components=1
+          cd ${GITHUB_WORKSPACE}/sources/gcc
+          mkdir -p {gmp,mpc,mpfr}
+          tar -xf ${GITHUB_WORKSPACE}/sources/gmp-*.tar.xz  -C ${GITHUB_WORKSPACE}/sources/gcc/gmp  --strip-components=1
+          tar -xf ${GITHUB_WORKSPACE}/sources/mpc-*.tar.gz  -C ${GITHUB_WORKSPACE}/sources/gcc/mpc  --strip-components=1
+          tar -xf ${GITHUB_WORKSPACE}/sources/mpfr-*.tar.xz -C ${GITHUB_WORKSPACE}/sources/gcc/mpfr --strip-components=1
+          mkdir -v build
+        
+      - name: Configure GCC
+        run: |
+          cd ${GITHUB_WORKSPACE}/sources/gcc
+          ./configure \
+            --target=$(uname -m)-lfs-linux-gnu \
+            --prefix=${GITHUB_WORKSPACE}/tools \
+            --with-glibc-version=2.38 \
+            --with-sysroot=${GITHUB_WORKSPACE}/output \
+            --with-newlib \
+            --without-headers \
+            --enable-initfini-array \
+            --disable-nls \
+            --disable-shared \
+            --disable-multilib \
+            --disable-decimal-float \
+            --disable-threads \
+            --disable-libatomic \
+            --disable-libgomp \
+            --disable-libquadmath \
+            --disable-libssp \
+            --disable-libvtv \
+            --disable-libstdcxx \
+            --enable-languages=c,c++
+      
+      - name: Make GCC
+        run: |
+          cd ${GITHUB_WORKSPACE}/sources/gcc
+          make -j$(nproc)
+          make install
+          cd ${GITHUB_WORKSPACE} && rm -Rf ${GITHUB_WORKSPACE}/sources/gcc
           
 
       #- name: Create OSTree Repository
