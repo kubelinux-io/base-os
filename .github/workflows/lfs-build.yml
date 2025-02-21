@@ -1,0 +1,58 @@
+name: Build LFS Base OS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: rockylinux:9
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Build Dependencies
+        run: |
+          sudo dnf install -y make gcc g++ perl python3 texinfo wget bison flex patch tar xz
+
+      - name: Prepare LFS Build Environment
+        run: |
+          export LFS=/mnt/lfs
+          mkdir -p $LFS
+          echo "export LFS=/mnt/lfs" >> ~/.bashrc
+          source ~/.bashrc
+
+      - name: Download LFS Packages
+        run: |
+          wget http://www.linuxfromscratch.org/lfs/downloads/stable/wget-list
+          wget --input-file=wget-list --continue --directory-prefix=$LFS/sources
+
+      - name: Build LFS System
+        run: |
+          cd build
+          bash build-lfs.sh
+
+      #- name: Create OSTree Repository
+      #  run: |
+      #    mkdir -p /tmp/ostree_repo
+      #    ostree --repo=/tmp/ostree_repo init --mode=archive-z2
+      #    ostree --repo=/tmp/ostree_repo commit -b kubelinux --tree=dir=/mnt/lfs --subject="LFS Build $(date)"
+
+      #- name: Upload OSTree Commit to S3
+      #  env:
+      #    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #  run: |
+      #    aws s3 sync /tmp/ostree_repo s3://kubelinux-ostree --acl public-read
+
+      #- name: Publish OSTree Image as OCI for BootC
+      #  run: |
+      #    podman build -t ghcr.io/${{ github.repository }}/kubelinux-lfs:latest -f Dockerfile
+      #    podman push ghcr.io/${{ github.repository }}/kubelinux-lfs:latest
