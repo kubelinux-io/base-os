@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Build Dependencies
         run: |
-          dnf install -y make gcc g++ perl python3 texinfo wget bison flex patch tar xz
+          dnf install -y make gcc g++ perl python3 info wget bison flex patch tar xz
 
       - name: Prepare LFS Build Environment
         run: |
