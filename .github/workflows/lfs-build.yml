@@ -1,5 +1,8 @@
 name: Build LFS Base OS
 
+env:
+  LFS: /mnt/lfs
+
 on:
   push:
     branches:
@@ -7,7 +10,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
@@ -24,11 +26,9 @@ jobs:
 
       - name: Prepare LFS Build Environment
         run: |
-          export LFS=/mnt/lfs
           mkdir -p ${LFS}
+          mkdir -p ${LFS}/data
           mkdir -p ${LFS}/sources
-          echo "export LFS=/mnt/lfs" >> ~/.bashrc
-          source ~/.bashrc
 
       - name: Restore Cached LFS Packages
         id: cache-lfs-packages-restore
@@ -42,9 +42,9 @@ jobs:
       - name: Download LFS Packages
         run: |
           if wget --input-file=wget-list --continue --directory-prefix=${LFS}/sources; then
-            export WGET_STATUS=0
+            echo -ne "0" > ${LFS}/data/wget_status
           else
-            export WGET_STATUS=1
+            echo -ne "1" > ${LFS}/data/wget_status
           fi
 
       - name: Save Cached LFS Packages
@@ -58,7 +58,7 @@ jobs:
       
       - name: Bail if Packages Missing
         run: |
-          exit ${WGET_STATUS}
+          exit $(cat ${LFS}/data/wget_status)
 
       - name: Build LFS System
         run: |

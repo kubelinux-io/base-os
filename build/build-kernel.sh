@@ -2,7 +2,6 @@
 set -e
 
 # Define environment
-export LFS=/mnt/lfs
 export PATH=$LFS/tools/bin:$PATH
 
 # Extract kernel source

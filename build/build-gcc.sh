@@ -2,7 +2,6 @@
 set -e
 
 # Define environment
-export LFS=/mnt/lfs
 export LFS_TGT=$(uname -m)-lfs-linux-gnu
 export PATH=$LFS/tools/bin:$PATH
 

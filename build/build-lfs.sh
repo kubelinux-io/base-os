@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-export LFS=/mnt/lfs
-
-mkdir -p $LFS
 cd $LFS
 
 # Build essential tools
